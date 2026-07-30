@@ -1,69 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Attendance Camera</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{
     margin:0;
     background:#111;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    flex-direction:column;
     color:white;
     font-family:Arial;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
 }
 
-video{
-    width:100%;
+video,canvas{
+
+    width:95%;
     max-width:420px;
     border-radius:16px;
+    margin-top:20px;
+
 }
 
 button{
-    margin-top:20px;
+
+    margin:15px;
     padding:15px 30px;
     font-size:18px;
-    border:none;
-    border-radius:12px;
-    cursor:pointer;
+
 }
 </style>
+
 </head>
 
 <body>
 
 <h2>Attendance Camera</h2>
 
-<video id="video" autoplay playsinline muted></video>
+<video id="video" autoplay playsinline></video>
 
-<button onclick="startCamera()">Start Camera</button>
+<canvas id="canvas" style="display:none;"></canvas>
+
+<button onclick="capture()">Capture</button>
 
 <script>
 
-async function startCamera(){
+const video=document.getElementById("video");
 
-    try{
+navigator.mediaDevices.getUserMedia({
 
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video:{
-                facingMode:"user"
-            }
-        });
+video:{
+facingMode:"user"
+}
 
-        document.getElementById("video").srcObject = stream;
+})
 
-    }
+.then(stream=>{
 
-    catch(e){
+video.srcObject=stream;
 
-        alert(e.name + "\n" + e.message);
+});
 
-    }
+function capture(){
+
+const canvas=document.getElementById("canvas");
+
+canvas.style.display="block";
+
+canvas.width=video.videoWidth;
+
+canvas.height=video.videoHeight;
+
+canvas.getContext("2d").drawImage(video,0,0);
 
 }
 
