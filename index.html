@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance Camera</title>
+
+<style>
+body{
+    margin:0;
+    background:#111;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    flex-direction:column;
+    color:white;
+    font-family:Arial;
+}
+
+video{
+    width:100%;
+    max-width:420px;
+    border-radius:16px;
+}
+
+button{
+    margin-top:20px;
+    padding:15px 30px;
+    font-size:18px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Attendance Camera</h2>
+
+<video id="video" autoplay playsinline muted></video>
+
+<button onclick="startCamera()">Start Camera</button>
+
+<script>
+
+async function startCamera(){
+
+    try{
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video:{
+                facingMode:"user"
+            }
+        });
+
+        document.getElementById("video").srcObject = stream;
+
+    }
+
+    catch(e){
+
+        alert(e.name + "\n" + e.message);
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
