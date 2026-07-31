@@ -46,7 +46,7 @@ button{
 }
 
 button:disabled{
-    opacity:0.6;
+    opacity:0.5;
     cursor:not-allowed;
 }
 
@@ -109,6 +109,7 @@ const employeeId = params.get("emp");
 
 const video = document.getElementById("video");
 const useBtn = document.getElementById("useBtn");
+const retakeBtn = document.getElementById("retakeBtn");
 
 navigator.mediaDevices.getUserMedia({
 
@@ -149,8 +150,8 @@ function capture(){
     canvas.style.display="block";
 
     document.getElementById("captureBtn").style.display="none";
-    document.getElementById("retakeBtn").style.display="inline-block";
-    document.getElementById("useBtn").style.display="inline-block";
+    retakeBtn.style.display="inline-block";
+    useBtn.style.display="inline-block";
 
 }
 
@@ -164,8 +165,8 @@ function retake(){
     document.getElementById("canvas").style.display="none";
 
     document.getElementById("captureBtn").style.display="inline-block";
-    document.getElementById("retakeBtn").style.display="none";
-    document.getElementById("useBtn").style.display="none";
+    retakeBtn.style.display="none";
+    useBtn.style.display="none";
 
 }
 
@@ -186,7 +187,13 @@ async function uploadPhoto(){
     useBtn.disabled = true;
     useBtn.textContent = "Uploading...";
 
-    document.getElementById("status").innerText = "Uploading...";
+    retakeBtn.disabled = true;
+    retakeBtn.textContent = "Please wait...";
+
+    document.getElementById("status").innerText = "Uploading photo...";
+
+    // Give browser time to repaint buttons
+    await new Promise(resolve => setTimeout(resolve,50));
 
     const canvas = document.getElementById("canvas");
 
@@ -198,6 +205,7 @@ async function uploadPhoto(){
 
             method:"POST",
             mode:"no-cors",
+
             body:JSON.stringify({
 
                 employeeId:employeeId,
@@ -209,18 +217,20 @@ async function uploadPhoto(){
         });
 
         document.getElementById("status").innerText =
-            "Attendance photo submitted.";
+        "Attendance photo submitted.";
 
     }
 
     catch(e){
 
-        // Re-enable button so user can retry
         useBtn.disabled = false;
         useBtn.textContent = "Use Photo";
 
+        retakeBtn.disabled = false;
+        retakeBtn.textContent = "Retake";
+
         document.getElementById("status").innerText =
-            "Upload failed. Please try again.";
+        "Upload failed. Please try again.";
 
         console.error(e);
         alert(e.toString());
@@ -232,4 +242,4 @@ async function uploadPhoto(){
 </script>
 
 </body>
-</html>
+</html>            
