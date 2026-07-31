@@ -187,7 +187,7 @@ async function uploadPhoto(){
         const response = await fetch("https://script.google.com/macros/s/AKfycbzHEfurC8Dveue3utBOKcjfd1cWaSfrk57OgBC7KdRsXpfe2KDINztW3mmNi0-nLaK5cg/exec",{
 
             method:"POST",
-
+            mode: "no-cors",
             body:JSON.stringify({
 
                 employeeId:employeeId,
