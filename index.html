@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 
 <meta charset="UTF-8">
@@ -11,56 +10,49 @@
 <style>
 
 body{
-
     margin:0;
     background:#111;
     color:white;
-    font-family:Arial;
+    font-family:Arial, Helvetica, sans-serif;
     display:flex;
     flex-direction:column;
     align-items:center;
     padding:20px;
-
 }
 
 h2{
-
     margin-bottom:10px;
-
 }
 
 video,
 canvas{
-
     width:100%;
     max-width:420px;
     border-radius:15px;
     background:black;
-
 }
 
 canvas{
-
     display:none;
-
 }
 
 button{
-
     margin-top:15px;
     padding:15px 25px;
     font-size:18px;
     border:none;
     border-radius:12px;
     cursor:pointer;
-
 }
 
 #retakeBtn,
 #useBtn{
-
     display:none;
+}
 
+#status{
+    margin-top:15px;
+    color:#8cff8c;
 }
 
 </style>
@@ -69,7 +61,7 @@ button{
 
 <body>
 
-<h2>Attendance Camera v2</h2>
+<h2>Attendance Camera</h2>
 
 <video
 id="video"
@@ -88,13 +80,28 @@ Capture
 Retake
 </button>
 
-<button id="useBtn">
+<button id="useBtn" onclick="uploadPhoto()">
 Use Photo
 </button>
 
+<p id="status"></p>
+
 <script>
 
-const video=document.getElementById("video");
+// ==============================
+// Read Employee ID from URL
+// Example:
+// ?emp=EMP001
+// ==============================
+
+const params = new URLSearchParams(window.location.search);
+const employeeId = params.get("emp");
+
+// ==============================
+// Start Camera
+// ==============================
+
+const video = document.getElementById("video");
 
 navigator.mediaDevices.getUserMedia({
 
@@ -106,7 +113,7 @@ navigator.mediaDevices.getUserMedia({
 
 .then(stream=>{
 
-    video.srcObject=stream;
+    video.srcObject = stream;
 
 })
 
@@ -116,14 +123,18 @@ navigator.mediaDevices.getUserMedia({
 
 });
 
+// ==============================
+// Capture
+// ==============================
+
 function capture(){
 
-    const canvas=document.getElementById("canvas");
+    const canvas = document.getElementById("canvas");
 
-    canvas.width=video.videoWidth;
-    canvas.height=video.videoHeight;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
-    const ctx=canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
 
     ctx.drawImage(video,0,0);
 
@@ -136,6 +147,10 @@ function capture(){
 
 }
 
+// ==============================
+// Retake
+// ==============================
+
 function retake(){
 
     video.style.display="block";
@@ -147,8 +162,67 @@ function retake(){
 
 }
 
+// ==============================
+// Upload
+// ==============================
+
+async function uploadPhoto(){
+
+    if(!employeeId){
+
+        alert("Employee ID not found.");
+
+        return;
+
+    }
+
+    document.getElementById("status").innerText="Uploading...";
+
+    const canvas = document.getElementById("canvas");
+
+    const image = canvas.toDataURL("image/jpeg",0.9);
+
+    try{
+
+        const response = await fetch("YOUR_APPS_SCRIPT_URL",{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                employeeId:employeeId,
+
+                capturedAt:new Date().toISOString(),
+
+                image:image
+
+            })
+
+        });
+
+        const result = await response.text();
+
+        document.getElementById("status").innerText=result;
+
+        alert(result);
+
+    }
+
+    catch(e){
+
+        console.error(e);
+
+        alert("Upload failed.");
+
+    }
+
+}
+
 </script>
 
 </body>
-
 </html>
