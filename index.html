@@ -45,6 +45,11 @@ button{
     cursor:pointer;
 }
 
+button:disabled{
+    opacity:0.6;
+    cursor:not-allowed;
+}
+
 #retakeBtn,
 #useBtn{
     display:none;
@@ -53,6 +58,7 @@ button{
 #status{
     margin-top:15px;
     color:#8cff8c;
+    font-size:16px;
 }
 
 </style>
@@ -102,6 +108,7 @@ const employeeId = params.get("emp");
 // ==============================
 
 const video = document.getElementById("video");
+const useBtn = document.getElementById("useBtn");
 
 navigator.mediaDevices.getUserMedia({
 
@@ -171,12 +178,15 @@ async function uploadPhoto(){
     if(!employeeId){
 
         alert("Employee ID not found.");
-
         return;
 
     }
 
-    document.getElementById("status").innerText="Uploading...";
+    // Prevent duplicate uploads
+    useBtn.disabled = true;
+    useBtn.textContent = "Uploading...";
+
+    document.getElementById("status").innerText = "Uploading...";
 
     const canvas = document.getElementById("canvas");
 
@@ -184,31 +194,33 @@ async function uploadPhoto(){
 
     try{
 
-        const response = await fetch("https://script.google.com/macros/s/AKfycbzHEfurC8Dveue3utBOKcjfd1cWaSfrk57OgBC7KdRsXpfe2KDINztW3mmNi0-nLaK5cg/exec",{
+        await fetch("https://script.google.com/macros/s/AKfycbzHEfurC8Dveue3utBOKcjfd1cWaSfrk57OgBC7KdRsXpfe2KDINztW3mmNi0-nLaK5cg/exec",{
 
             method:"POST",
-            mode: "no-cors",
+            mode:"no-cors",
             body:JSON.stringify({
 
                 employeeId:employeeId,
-
                 capturedAt:new Date().toISOString(),
-
                 image:image
 
             })
 
         });
 
-        
-
-        document.getElementById("status").innerText="Upload request sent";
-
-        alert("Upload request sent.");
+        document.getElementById("status").innerText =
+            "Attendance photo submitted.";
 
     }
 
     catch(e){
+
+        // Re-enable button so user can retry
+        useBtn.disabled = false;
+        useBtn.textContent = "Use Photo";
+
+        document.getElementById("status").innerText =
+            "Upload failed. Please try again.";
 
         console.error(e);
         alert(e.toString());
