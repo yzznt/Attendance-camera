@@ -200,19 +200,18 @@ async function uploadPhoto(){
 
         });
 
+        
+
+        document.getElementById("status").innerText="Upload request sent";
+
         alert("Upload request sent.");
-
-        document.getElementById("status").innerText=result;
-
-        alert(result);
 
     }
 
     catch(e){
 
         console.error(e);
-
-        alert("Upload failed.");
+        alert(e.toString());
 
     }
 
